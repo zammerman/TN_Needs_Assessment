@@ -333,8 +333,7 @@
     <div class="bottom-description">
         <p><b>Population Health</b> was measured using a number of data variables, including: Percent of the population that is insured, age (% disabled, % over 65, % under 18), % of population below 100% federal poverty level, life expectancy, and a number of population health outcome measures (infant mortality, coronary heart disease, stroke, high blood pressure, cancer, obesity, chronic kidney disease, frequent mental distress).<br><br>
 <b>Healthcare Resources</b> were measured by the healthcare infrastructure (total hospital-beds-to-population), current physician workforce (primary care and specialty population-to-provider ratios), and workforce-in-training (first-year resident positions-to-population ratio).<br><br>
-The <b>Overall Score</b> is the composite of these two scores.<br><span class="fullscreen-link" id="fullscreen-link">Click here to see this map in full-screen mode</span></p>
-    </div>
+The <b>Overall Score</b> is the composite of these two scores.<br><span class="fullscreen-link" id="fullscreen-link">Open map in new tab for full-screen viewing</span></p>    </div>
     
     <div class="legend" id="legend-dynamic">
         <div class="legend-title" id="legend-title">Overall Score - County Rankings</div>
@@ -443,17 +442,10 @@ The <b>Overall Score</b> is the composite of these two scores.<br><span class="f
 document.getElementById('legend-title').textContent = scoreType + ' Score';
             }
             
-            // Fullscreen functionality
-            document.getElementById('fullscreen-link').addEventListener('click', () => {
-                const elem = document.documentElement;
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) {
-                    elem.msRequestFullscreen();
-                }
-            });
+           // Fullscreen functionality - opens in new tab
+document.getElementById('fullscreen-link').addEventListener('click', () => {
+    window.open(window.location.href, '_blank');
+});
 
             // Toggle dropdown (kept for score dropdown only)
             document.getElementById('score-dropdown-header').addEventListener('click', () => {
