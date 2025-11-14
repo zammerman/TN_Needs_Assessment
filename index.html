@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tennessee Health Needs Assessment</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .layer-toggle-menu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1;
+            max-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .title-section {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            max-width: 700px;
+            padding: 8px;
+
+        }
+
+        .logo-section {
+            position: absolute;
+            bottom: 60px;
+            right: 10px;
+            z-index: 2;
+        }
+
+        .logo-section img {
+            width: 250px;
+            height: auto;
+            display: block;
+        }
+        
+        .title-section h4 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+       .bottom-description {
+    position: absolute;
+    top: 60px;
+    left: 20px;
+    z-index: 2;
+    max-width: 700px;
+    text-align: left;
+    padding: 0;
+}
+        
+        .bottom-description p {
+            margin: 0;
+            font-size: 10px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+        
+        .fullscreen-link {
+            color: #87CEEB;
+            text-decoration: underline;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 11px;
+        }
+        
+        .fullscreen-link:hover {
+            color: #ADD8E6;
+        }
+        
+        .dropdown-section {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .dropdown-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #000000;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .dropdown-arrow {
+            font-size: 12px;
+            color: #666;
+            transition: transform 0.2s;
+        }
+        
+        .dropdown-arrow.expanded {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .dropdown-content.expanded {
+            max-height: 500px;
+            padding-top: 10px;
+        }
+        
+        .score-select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 13px;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .score-select:focus {
+            outline: none;
+            border-color: #999;
+        }
+        
+        .mapboxgl-popup-content {
+            padding: 15px;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        
+        .popup-title {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .popup-data {
+            font-size: 14px;
+            color: #000000;
+            margin-bottom: 5px;
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 65px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-family: system-ui, -apple-system, sans-serif;
+            z-index: 1;
+            min-width: 200px;
+        }
+        
+        .legend-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .legend-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 14px;
+            border-radius: 2px;
+        }
+        
+        .legend-label {
+            font-size: 11px;
+            color: #000000;
+        }
+        
+        .no-data-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .no-data-box {
+            width: 20px;
+            height: 14px;
+            background-color: #cccccc;
+            border-radius: 2px;
+        }
+        
+        .no-data-text {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .rural-legend {
+            position: absolute;
+            bottom: 20px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-family: system-ui, -apple-system, sans-serif;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rural-legend-box {
+            width: 16px;
+            height: 16px;
+            background-color: #999;
+            background-image: repeating-linear-gradient(
+                -45deg,
+                white,
+                white 1px,
+                transparent 1px,
+                transparent 4px
+            );
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .rural-legend-text {
+            font-size: 12px;
+            color: #333;
+        }
+
+        .map-credit {
+            position: absolute;
+            bottom: 30px;
+            right: 10px;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 11px;
+            color: #666;
+            z-index: 1;
+        }
+
+        .map-credit a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        .map-credit a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <!-- Title Section (no longer collapsible) -->
+    <div class="title-section">
+        <h4>Tennessee Health Needs Assessment</h4>
+    </div>
+
+    <!-- Logo Section -->
+    <div class="logo-section">
+        <img src="http://veritastestsite.com/wp-content/uploads/2025/08/Asset-1.png" alt="Logo">
+    </div>
+    
+    <!-- Score Type Dropdown -->
+    <div class="layer-toggle-menu">
+        <div class="dropdown-section">
+            <div class="dropdown-header" id="score-dropdown-header">
+                <div class="dropdown-title">Score Type</div>
+                <div class="dropdown-arrow expanded" id="score-dropdown-arrow">▼</div>
+            </div>
+            <div class="dropdown-content expanded" id="score-dropdown-content">
+                <select id="score-select" class="score-select">
+                    <option value="Overall">Overall Score</option>
+                    <option value="Population Health">Population Health Score</option>
+                    <option value="Health Resources">Healthcare Resources Score</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bottom Description -->
+    <div class="bottom-description">
+        <p><b>Population Health</b> was measured using a number of data variables, including: Percent of the population that is insured, age (% disabled, % over 65, % under 18), % of population below 100% federal poverty level, life expectancy, and a number of population health outcome measures (infant mortality, coronary heart disease, stroke, high blood pressure, cancer, obesity, chronic kidney disease, frequent mental distress).<br><br>
+<b>Healthcare Resources</b> were measured by the healthcare infrastructure (total hospital-beds-to-population), current physician workforce (primary care and specialty population-to-provider ratios), and workforce-in-training (first-year resident positions-to-population ratio).<br><br>
+The <b>Overall Score</b> is the composite of these two scores.<br><span class="fullscreen-link" id="fullscreen-link">Click here to see this map in full-screen mode</span></p>
+    </div>
+    
+    <div class="legend" id="legend-dynamic">
+        <div class="legend-title" id="legend-title">Overall Score - County Rankings</div>
+        <div class="legend-items">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #124a4d;"></div>
+                <div class="legend-label">Top Quintile (Ranks 1-19)</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #559189;"></div>
+                <div class="legend-label">2nd Quintile (Ranks 20-38)</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #a0c0a2;"></div>
+                <div class="legend-label">3rd Quintile (Ranks 39-57)</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #f1d798;"></div>
+                <div class="legend-label">4th Quintile (Ranks 58-76)</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #e68953;"></div>
+                <div class="legend-label">Bottom Quintile (Ranks 77-95)</div>
+            </div>
+        </div>
+        <div class="no-data-indicator">
+            <div class="no-data-box"></div>
+            <div class="no-data-text">No data available</div>
+        </div>
+    </div>
+    
+    <div class="map-credit">
+        Map development by <a href="https://www.zacharyammerman.com/" target="_blank">Zachary Ammerman</a>
+    </div>
+    
+    <div class="rural-legend" id="rural-legend">
+        <div class="rural-legend-box"></div>
+        <div class="rural-legend-text">Rural Counties (USDA RUCC >= 4)</div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiemFtbWVybWFuODkiLCJhIjoiY2xubHJ6ajZ0MjFsdTJrbWs3dXE0dHVqZyJ9.SnToZ2sk33b7fg2A_orXQQ';
+        
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/zammerman89/cmh0rw64m005f01s35qtv0jjj',
+            center: [-86.196529, 35.743127],
+            zoom: 6.62
+        });
+        
+        // Color scheme for quintiles (best to worst)
+        const quintileColors = [
+            '#124a4d', // Top Quintile (best)
+            '#559189', // 2nd Quintile
+            '#a0c0a2', // 3rd Quintile
+            '#f1d798', // 4th Quintile
+            '#e68953'  // Bottom Quintile (worst)
+        ];
+        
+        // Score configurations
+        const scoreConfigs = {
+            'Overall': {
+                field: 'TN County Health Scores - FINAL_OVERALL Z SCORE',
+                rankField: 'TN County Health Scores - FINAL_OVERALL RANK'
+            },
+            'Population Health': {
+                field: 'TN County Health Scores - FINAL_POPHEALTH Z SCORE',
+                rankField: 'TN County Health Scores - FINAL_POPHEALTH RANK'
+            },
+            'Health Resources': {
+                field: 'TN County Health Scores - FINAL_RESOURCE Z SCORE',
+                rankField: 'TN County Health Scores - FINAL_RESOURCE RANK'
+            }
+        };
+        
+        let currentScoreType = 'Overall';
+        let currentPopup = null;
+        
+        map.on('load', () => {
+            // Update score layer with quintile-based styling
+            function updateScoreLayer(scoreType) {
+                currentScoreType = scoreType;
+                const config = scoreConfigs[scoreType];
+                
+                // Create paint expression for quintiles based on rank
+                const paintExpression = [
+                    'case',
+                    ['==', ['get', config.rankField], null],
+                    '#cccccc',
+                    [
+                        'step',
+                        ['get', config.rankField],
+                        quintileColors[0], // Default to top quintile
+                        20, quintileColors[1], // 20-38
+                        39, quintileColors[2], // 39-57
+                        58, quintileColors[3], // 58-76
+                        77, quintileColors[4]  // 77-95
+                    ]
+                ];
+                
+                // Update the layer paint property
+                map.setPaintProperty('OVERALL Z SCORE', 'fill-color', paintExpression);
+                map.setPaintProperty('OVERALL Z SCORE', 'fill-opacity', 0.8);
+                
+                // Update legend title
+document.getElementById('legend-title').textContent = scoreType + ' Score';
+            }
+            
+            // Fullscreen functionality
+            document.getElementById('fullscreen-link').addEventListener('click', () => {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            });
+
+            // Toggle dropdown (kept for score dropdown only)
+            document.getElementById('score-dropdown-header').addEventListener('click', () => {
+                const content = document.getElementById('score-dropdown-content');
+                const arrow = document.getElementById('score-dropdown-arrow');
+                content.classList.toggle('expanded');
+                arrow.classList.toggle('expanded');
+            });
+
+            // Score select change handler
+            document.getElementById('score-select').addEventListener('change', (e) => {
+                updateScoreLayer(e.target.value);
+            });
+            
+            // Initialize with default score type
+            map.once('idle', () => {
+                map.setLayoutProperty('OVERALL Z SCORE', 'visibility', 'visible');
+                updateScoreLayer('Overall');
+            });
+            
+            // Hover cursor
+            map.on('mouseenter', 'OVERALL Z SCORE', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            
+            map.on('mouseleave', 'OVERALL Z SCORE', () => {
+                map.getCanvas().style.cursor = '';
+            });
+            
+            // Click handler for counties
+            map.on('click', 'OVERALL Z SCORE', (e) => {
+                const features = e.features;
+                
+                if (features.length > 0) {
+                    const feature = features[0];
+                    const properties = feature.properties;
+                    const config = scoreConfigs[currentScoreType];
+                    
+                    const countyName = properties.County || properties.NAME || properties.name || 'Unknown County';
+                    const zScore = properties[config.field];
+                    const rank = properties[config.rankField];
+                    
+                    let popupContent = `<div class="popup-title">${countyName}</div>`;
+                    
+                    if (rank !== undefined && rank !== null) {
+                        let quintile = '';
+                        if (rank <= 19) quintile = 'Top';
+                        else if (rank <= 38) quintile = '2nd';
+                        else if (rank <= 57) quintile = '3rd';
+                        else if (rank <= 76) quintile = '4th';
+                        else quintile = 'Bottom';
+                        
+                        popupContent += `<div class="popup-data"><strong>County Rank:</strong> ${rank} of 95</div>`;
+                        popupContent += `<div class="popup-data"><strong>Quintile:</strong> ${quintile}</div>`;
+                    }
+                    
+                    if (zScore !== undefined && zScore !== null) {
+                        popupContent += `<div class="popup-data"><strong>${currentScoreType} Z-Score:</strong> ${parseFloat(zScore).toFixed(2)}</div>`;
+                    }
+                    
+                    if (currentPopup) currentPopup.remove();
+                    currentPopup = new mapboxgl.Popup()
+                        .setLngLat(e.lngLat)
+                        .setHTML(popupContent)
+                        .addTo(map);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
