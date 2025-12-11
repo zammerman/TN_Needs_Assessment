@@ -658,13 +658,19 @@ The <b>Overall Score</b> is the composite of these two scores.</p>
     </div>
 
     <script>
-        mapboxgl.accessToken = 'pk.eyJ1IjoiemFtbWVybWFuODkiLCJhIjoiY2xubHJ6ajZ0MjFsdTJrbWs3dXE0dHVqZyJ9.SnToZ2sk33b7fg2A_orXQQ';
+      mapboxgl.accessToken = 'pk.eyJ1IjoiemFtbWVybWFuODkiLCJhIjoiY2xubHJ6ajZ0MjFsdTJrbWs3dXE0dHVqZyJ9.SnToZ2sk33b7fg2A_orXQQ';
         
-       const map = new mapboxgl.Map({
+// Chrome iframe fix - use CSP worker
+mapboxgl.workerUrl = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl-csp-worker.js';
+        
+const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/zammerman89/cmh0rw64m005f01s35qtv0jjj',
     center: [-86.196529, 35.743127],
-    zoom: 6.62
+    zoom: 6.62,
+    preserveDrawingBuffer: true,
+    antialias: false,
+    failIfMajorPerformanceCaveat: false
 });
 
 // Chrome iframe fix - force map to resize after initialization
