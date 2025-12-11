@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tennessee Health Needs Assessment</title>
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
@@ -658,36 +660,14 @@ The <b>Overall Score</b> is the composite of these two scores.</p>
     </div>
 
     <script>
-      mapboxgl.accessToken = 'pk.eyJ1IjoiemFtbWVybWFuODkiLCJhIjoiY2xubHJ6ajZ0MjFsdTJrbWs3dXE0dHVqZyJ9.SnToZ2sk33b7fg2A_orXQQ';
+        mapboxgl.accessToken = 'pk.eyJ1IjoiemFtbWVybWFuODkiLCJhIjoiY2xubHJ6ajZ0MjFsdTJrbWs3dXE0dHVqZyJ9.SnToZ2sk33b7fg2A_orXQQ';
         
-// Chrome iframe fix - use CSP worker
-mapboxgl.workerUrl = 'https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl-csp-worker.js';
-        
-const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/zammerman89/cmh0rw64m005f01s35qtv0jjj',
-    center: [-86.196529, 35.743127],
-    zoom: 6.62,
-    preserveDrawingBuffer: true,
-    antialias: false,
-    failIfMajorPerformanceCaveat: false
-});
-
-// Chrome iframe fix - force map to resize after initialization
-if (/Chrome/.test(navigator.userAgent) && window.self !== window.top) {
-    map.once('load', () => {
-        setTimeout(() => {
-            map.resize();
-        }, 250);
-    });
-}
-
-// Also try forcing a resize on the map's idle event
-map.once('idle', () => {
-    if (/Chrome/.test(navigator.userAgent) && window.self !== window.top) {
-        map.resize();
-    }
-});
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/zammerman89/cmh0rw64m005f01s35qtv0jjj',
+            center: [-86.196529, 35.743127],
+            zoom: 6.62
+        });
         
         // Color scheme for quintiles (best to worst)
         const quintileColors = [
